@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence List · ChainTrace</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="upload.html">Chain<span class="mark">Trace</span></a>
+  <nav>
+    <a href="upload.html">Upload</a>
+    <a href="dashboard.html" class="active">Evidence List</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Evidence List</h1>
+  <p class="subtitle">All fingerprinted evidence on file.</p>
+
+  <div id="status-area"></div>
+
+  <div class="card" style="padding: 0; overflow-x: auto;">
+    <table id="evidence-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>Filename</th>
+          <th>Collected By</th>
+          <th>Date</th>
+          <th>Hash</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="evidence-tbody"></tbody>
+    </table>
+    <div id="empty-state" class="empty-state" style="display:none;">
+      No evidence has been uploaded yet. <a href="upload.html">Upload the first file</a>.
+    </div>
+    <div id="loading-state" class="loading" style="padding: 24px;">Loading evidence...</div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

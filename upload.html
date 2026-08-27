@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Evidence · ChainTrace</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="upload.html">Chain<span class="mark">Trace</span></a>
+  <nav>
+    <a href="upload.html" class="active">Upload</a>
+    <a href="dashboard.html">Evidence List</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Upload Evidence</h1>
+  <p class="subtitle">Upload a file to generate its fingerprint and start a custody trail.</p>
+
+  <div class="card">
+    <form id="upload-form">
+      <div class="field">
+        <label for="file-input">File</label>
+        <input type="file" id="file-input" name="file" required>
+      </div>
+      <div class="field">
+        <label for="collected-by">Collected by</label>
+        <input type="text" id="collected-by" name="collectedBy" placeholder="e.g. Officer J. Rivera">
+      </div>
+      <div class="field">
+        <label for="description">Description</label>
+        <input type="text" id="description" name="description" placeholder="e.g. WhatsApp export, case #001">
+      </div>
+      <button type="submit" id="submit-btn">Upload &amp; Fingerprint</button>
+    </form>
+    <div id="result-area"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="upload.js"></script>
+</body>
+</html>
