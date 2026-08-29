@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custody Trail · ChainTrace</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="upload.html">Chain<span class="mark">Trace</span></a>
+  <nav>
+    <a href="upload.html">Upload</a>
+    <a href="dashboard.html">Evidence List</a>
+  </nav>
+</div>
+
+<div class="page">
+  <div id="header-loading" class="loading">Loading evidence details...</div>
+
+  <div id="header-area" style="display:none;">
+    <h1 id="file-name">—</h1>
+    <p class="subtitle">
+      Original hash: <span class="hash" id="original-hash">—</span>
+    </p>
+  </div>
+
+  <div id="status-area"></div>
+
+  <div class="card">
+    <div class="button-row">
+      <button id="add-event-btn" class="secondary">Add Custody Event</button>
+      <button id="check-chain-btn" class="secondary">Check Chain Integrity</button>
+    </div>
+
+    <div id="add-event-form" class="inline-form">
+      <h2>Add Custody Event</h2>
+      <div class="form-row">
+        <div class="field">
+          <label for="action-select">Action</label>
+          <select id="action-select">
+            <option value="Transferred">Transferred</option>
+            <option value="Viewed">Viewed</option>
+            <option value="Exported">Exported</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="actor-input">Actor name</label>
+          <input type="text" id="actor-input" placeholder="e.g. Officer J. Rivera">
+        </div>
+        <div class="field" style="flex: 0 0 auto;">
+          <label style="visibility:hidden;">Submit</label>
+          <button id="submit-event-btn" type="button">Add Event</button>
+        </div>
+      </div>
+      <div id="add-event-status"></div>
+    </div>
+
+    <div id="chain-check-result"></div>
+  </div>
+
+  <div class="card">
+    <h2>Custody Timeline</h2>
+    <div id="timeline-loading" class="loading">Loading custody trail...</div>
+    <ul id="timeline" class="timeline" style="display:none;"></ul>
+    <div id="timeline-empty" class="empty-state" style="display:none;">No custody events recorded yet.</div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="custody.js"></script>
+</body>
+</html>
