@@ -20,7 +20,12 @@ function readDb() {
 }
 
 function writeDb(db) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+  const directory = path.dirname(DB_PATH);
+  fs.mkdirSync(directory, { recursive: true });
+
+  const temporaryPath = `${DB_PATH}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(temporaryPath, JSON.stringify(db, null, 2), "utf-8");
+  fs.renameSync(temporaryPath, DB_PATH);
 }
 
 module.exports = { readDb, writeDb };
