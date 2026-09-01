@@ -313,8 +313,13 @@ tbody tr:hover {
   background: var(--amber-tint);
 }
 
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .actions a {
-  margin-right: 18px;
   color: var(--ink);
   font-size: 13px;
   font-weight: 700;

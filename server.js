@@ -196,6 +196,22 @@ app.get("/evidence/:id", (req, res) => {
   res.json(db.evidence[id]);
 });
 
+// GET /evidence/:id/file — serves the actual stored file for viewing/download
+app.get("/evidence/:id/file", (req, res) => {
+  const { id } = req.params;
+  const db = readDb();
+  const record = db.evidence[id];
+
+  if (!record) {
+    return res.status(404).json({ message: "Evidence not found." });
+  }
+  if (!fs.existsSync(record.storedPath)) {
+    return res.status(404).json({ message: "Stored file is missing on disk." });
+  }
+
+  res.download(record.storedPath, record.filename);
+});
+
 app.listen(PORT, () => {
   console.log(`ChainTrace backend running at http://localhost:${PORT}`);
 });

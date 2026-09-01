@@ -49,6 +49,7 @@ function rowHtml(item) {
       <td data-label="Actions" class="actions">
         <a href="custody.html?id=${encodeURIComponent(id)}">View Custody Trail</a>
         <a href="verify.html?id=${encodeURIComponent(id)}">Verify Integrity</a>
+        <a href="${API_BASE_URL}/evidence/${encodeURIComponent(id)}/file" target="_blank">View Original File</a>
       </td>
     </tr>
   `;
