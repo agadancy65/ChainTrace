@@ -148,8 +148,8 @@ async function runChainCheck() {
     if (data.valid) {
       chainCheckResult.innerHTML = `<div class="status-banner success">Chain integrity verified. Every custody entry matches the one before it.</div>`;
     } else {
-      const brokenAt = data.brokenAt ? ` at entry "${escapeHtml(String(data.brokenAt))}"` : "";
-      chainCheckResult.innerHTML = `<div class="status-banner error">Chain integrity broken${brokenAt}. ${escapeHtml(data.message || "The custody trail does not link up correctly from that point forward.")}</div>`;
+      const brokenAt = (data.brokenAt !== null && data.brokenAt !== undefined) ? ` at entry ${data.brokenAt + 1}` : "";
+      chainCheckResult.innerHTML = `<div class="status-banner error">Chain integrity broken${brokenAt}. ${escapeHtml(data.reason || "The custody trail does not link up correctly from that point forward.")}</div>`;
     }
   } catch (err) {
     chainCheckResult.innerHTML = `<div class="status-banner error">Could not check chain integrity. ${escapeHtml(err.message || "")}</div>`;
