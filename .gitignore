@@ -3,3 +3,4 @@ uploads/*
 !uploads/.gitkeep
 data/db.json
 server.log
+.env
