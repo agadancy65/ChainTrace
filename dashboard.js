@@ -8,7 +8,7 @@ loadEvidence();
 
 async function loadEvidence() {
   try {
-    const response = await fetch(`${API_BASE_URL}/evidence`);
+    const response = await authFetch(`${API_BASE_URL}/evidence`);
     if (!response.ok) {
       throw new Error(`Server returned status ${response.status}.`);
     }

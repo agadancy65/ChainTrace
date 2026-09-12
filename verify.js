@@ -14,7 +14,7 @@ if (!evidenceId) {
 
 async function runVerification() {
   try {
-    const response = await fetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/verify`);
+    const response = await authFetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/verify`);
     if (!response.ok) throw new Error(`Server returned status ${response.status}.`);
     const data = await response.json();
 

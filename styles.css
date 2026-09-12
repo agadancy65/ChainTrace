@@ -5,10 +5,11 @@
   --panel: #ffffff;
   --line: #d8d2c4;
   --muted: #6b6455;
-  --amber: #d98a1f;
+  --amber: #d1ab76;
   --amber-dark: #a6650f;
   --amber-tint: #fbeed9;
   --teal: #0f6d63;
+  --dark-blue: #ceccd5;
   --teal-tint: #e3f2ef;
   --danger: #b3261e;
   --danger-bg: #fbe9e7;
@@ -605,4 +606,90 @@ tbody tr:hover {
     font-weight: 800;
     margin-bottom: 3px;
   }
+}
+
+/* ---------- Login page ---------- */
+
+input[type="password"] {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: var(--sans);
+  background: var(--panel);
+  color: var(--ink);
+  transition: border-color 0.15s ease;
+}
+
+input[type="password"]::placeholder {
+  color: #a39c8c;
+}
+
+input[type="password"]:hover {
+  border-color: #b8b09c;
+}
+
+input[type="password"]:focus {
+  outline: 3px solid var(--amber);
+  outline-offset: 1px;
+  border-color: var(--amber-dark);
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark-blue) url("login-bg.svg") center center / cover no-repeat;
+  padding: 24px;
+}
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark-blue) url("login-bg.svg") center center / cover no-repeat;
+  padding: 24px;
+}
+
+.login-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--amber);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-brand {
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+
+.login-brand .mark {
+  color: var(--amber);
+}
+
+.login-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 26px;
+}
+
+.login-card .field {
+  margin-bottom: 18px;
+}
+
+.login-card button[type="submit"],
+.login-card button {
+  width: 100%;
+  margin-top: 4px;
+  padding: 14px 22px;
 }

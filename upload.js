@@ -27,7 +27,7 @@ form.addEventListener("submit", async (e) => {
   setLoading(true);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/evidence/upload`, {
+    const response = await authFetch(`${API_BASE_URL}/evidence/upload`, {
       method: "POST",
       body: formData,
     });

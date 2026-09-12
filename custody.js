@@ -36,7 +36,7 @@ checkChainBtn.addEventListener("click", runChainCheck);
 
 async function loadFileHeader() {
   try {
-    const response = await fetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}`);
+    const response = await authFetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}`);
     if (!response.ok) throw new Error(`Server returned status ${response.status}.`);
     const data = await response.json();
 

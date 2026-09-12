@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Login · ChainTrace</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <p class="login-brand">CHAIN<span class="mark">TRACE</span></p>
+    <p class="login-subtitle">Investigator sign-in</p>
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input id="username" type="text" placeholder="e.g. officer.joseph">
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="••••••••">
+    </div>
+
+    <button id="loginBtn">Log In</button>
+    <div id="error"></div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const errorEl = document.getElementById("error");
+      errorEl.innerHTML = "";
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          errorEl.innerHTML = `<div class="status-banner error">${data.message || "Login failed."}</div>`;
+          return;
+        }
+        localStorage.setItem("chaintrace_token", data.token);
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        errorEl.innerHTML = `<div class="status-banner error">Could not reach the server.</div>`;
+      }
+    });
+  </script>
+</body>
+
+</html>
