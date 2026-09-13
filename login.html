@@ -26,6 +26,11 @@
 
   <script src="config.js"></script>
   <script>
+    const params = new URLSearchParams(window.location.search);
+if (params.get("reason") === "inactivity") {
+  document.getElementById("error").innerHTML =
+    `<div class="status-banner info">You were logged out after 10 minutes of inactivity. Please log in again.</div>`;
+}
     document.getElementById("loginBtn").addEventListener("click", async () => {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value;
@@ -44,7 +49,9 @@
           return;
         }
         localStorage.setItem("chaintrace_token", data.token);
-        window.location.href = "dashboard.html";
+        const returnTo = sessionStorage.getItem("chaintrace_return_to");
+        sessionStorage.removeItem("chaintrace_return_to");
+        window.location.href = returnTo || "dashboard.html";
       } catch (err) {
         errorEl.innerHTML = `<div class="status-banner error">Could not reach the server.</div>`;
       }

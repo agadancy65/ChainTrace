@@ -1,0 +1,22 @@
+[
+  {
+    "username": "officer joseph",
+    "name": "Officer Joseph",
+    "passwordHash": "$2b$10$8NlEyXOZXwXe.Lzm4baVT.pXdwr5/wdn3IIzmEvYpJdCNhpY1g/7u"
+  },
+  {
+    "username": "officer dauda",
+    "name": "Officer Dauda",
+    "passwordHash": "$2b$10$Fcx3PZQq3kfAdJ6oy0yyCO5z.9PXkBSF.OiaxSd9GzedOSvRegiR6"
+  },
+  {
+    "username": "officer agada",
+    "name": "Officer Agada",
+    "passwordHash": "$2b$10$6M6274REyWCD4eTG/qNZ0.Ry9G23n2hxPn2hWLpydH.mhJXuPB8ZK"
+  },
+  {
+    "username": "officer elizabeth",
+    "name": "Officer Elizabeth",
+    "passwordHash": "$2b$10$KKVHhPKUqpamI535pal/fO.JEA8SGdZmap9.a4rebixMgofFONhKO"
+  }
+]

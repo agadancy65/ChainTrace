@@ -1,29 +1,97 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const multer = require("multer");
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { readLocalDb, writeLocalDb, syncNow } = require("./db");
+const { verifyLogin, issueToken, requireAuth } = require("./auth");
 
 const ALLOWED_ACTIONS = new Set(["Collected", "Transferred", "Viewed", "Exported", "Other"]);
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg", "image/png", "image/gif", "image/webp",
+  "application/pdf", "text/plain",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "video/mp4", "audio/mpeg",
+]);
+const ID_PATTERN = /^[a-f0-9]{16}$/;
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const UPLOAD_DIR = path.join(__dirname, "uploads");
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-const upload = multer({ dest: UPLOAD_DIR });
+app.use(helmet());
 
-app.use(cors());
+// Restrict to your actual frontend origins — adjust the port if Live Server uses a different one.
+app.use(cors({
+  origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
+}));
+
 app.use(express.json());
 
-let lastSync = { online: false, pushed: 0, pulled: 0, at: null };
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: { message: "Too many requests. Please slow down." },
+});
+app.use("/evidence", uploadLimiter);
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { message: "Too many login attempts. Please try again later." },
+});
+
+const UPLOAD_DIR = path.join(__dirname, "uploads");
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+const upload = multer({
+  dest: UPLOAD_DIR,
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB cap
+  fileFilter: (req, file, cb) => {
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return cb(new Error("File type not allowed."));
+    }
+    cb(null, true);
+  },
+});
+
+function validEvidenceId(req, res, next) {
+  if (!ID_PATTERN.test(req.params.id)) {
+    return res.status(400).json({ message: "Invalid evidence id." });
+  }
+  next();
+}
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
+// --- Auth ---
+
+app.post("/auth/login", loginLimiter, async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password required." });
+    }
+    const user = await verifyLogin(username, password);
+    if (!user) {
+      return res.status(401).json({ message: "Invalid username or password." });
+    }
+    const token = issueToken(user);
+    res.json({ token, name: user.name, username: user.username });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Login failed." });
+  }
+});
+
+// Everything below this line requires a valid token
+app.use(requireAuth);
 
 app.get("/sync/status", (req, res) => {
   res.json(lastSync);
@@ -83,7 +151,7 @@ function checkCustodyChain(evidenceId, events) {
 app.post("/evidence/upload", upload.single("file"), (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "No file was uploaded." });
+      return res.status(400).json({ message: "No file was uploaded, or file type/size was rejected." });
     }
 
     const { collectedBy, description } = req.body;
@@ -97,7 +165,7 @@ app.post("/evidence/upload", upload.single("file"), (req, res) => {
       id,
       filename: req.file.originalname,
       hash,
-      collectedBy: collectedBy || "",
+      collectedBy: collectedBy || req.user.name,
       description: description || "",
       uploadedAt,
       storedPath: req.file.path,
@@ -106,10 +174,10 @@ app.post("/evidence/upload", upload.single("file"), (req, res) => {
 
     const timestamp = uploadedAt;
     const previousHash = null;
-    const entryHash = hashCustodyEntry({ evidenceId: id, action: "Collected", actor: collectedBy || "Unknown", timestamp, previousHash });
+    const entryHash = hashCustodyEntry({ evidenceId: id, action: "Collected", actor: collectedBy || req.user.name, timestamp, previousHash });
 
     db.custody[id] = [
-      { action: "Collected", actor: collectedBy || "Unknown", timestamp, entryHash, previousHash, synced: false },
+      { action: "Collected", actor: collectedBy || req.user.name, timestamp, entryHash, previousHash, synced: false },
     ];
 
     writeLocalDb(db);
@@ -120,7 +188,7 @@ app.post("/evidence/upload", upload.single("file"), (req, res) => {
   }
 });
 
-app.get("/evidence/:id/custody", (req, res) => {
+app.get("/evidence/:id/custody", validEvidenceId, (req, res) => {
   const { id } = req.params;
   const db = readLocalDb();
   if (!db.evidence[id]) return res.status(404).json({ message: "Evidence not found." });
@@ -128,7 +196,7 @@ app.get("/evidence/:id/custody", (req, res) => {
   res.json(events.map(({ synced, ...rest }) => rest));
 });
 
-app.post("/evidence/:id/custody", (req, res) => {
+app.post("/evidence/:id/custody", validEvidenceId, (req, res) => {
   try {
     const { id } = req.params;
     const { action, actor } = req.body;
@@ -150,7 +218,7 @@ app.post("/evidence/:id/custody", (req, res) => {
     const newEvent = { action: actionText, actor: actorText, timestamp, entryHash, previousHash, synced: false };
     events.push(newEvent);
     db.custody[id] = events;
-    db.evidence[id].synced = false; // touched again, worth re-checking on next sync
+    db.evidence[id].synced = false;
 
     writeLocalDb(db);
     const { synced, ...responseEvent } = newEvent;
@@ -166,14 +234,14 @@ app.get("/evidence", (req, res) => {
   res.json(Object.values(db.evidence).map(publicEvidence));
 });
 
-app.get("/evidence/:id", (req, res) => {
+app.get("/evidence/:id", validEvidenceId, (req, res) => {
   const { id } = req.params;
   const db = readLocalDb();
   if (!db.evidence[id]) return res.status(404).json({ message: "Evidence not found." });
   res.json(publicEvidence(db.evidence[id]));
 });
 
-app.get("/evidence/:id/file", (req, res) => {
+app.get("/evidence/:id/file", validEvidenceId, (req, res) => {
   const { id } = req.params;
   const db = readLocalDb();
   const record = db.evidence[id];
@@ -182,7 +250,7 @@ app.get("/evidence/:id/file", (req, res) => {
   res.download(record.storedPath, record.filename);
 });
 
-app.get("/evidence/:id/verify", (req, res) => {
+app.get("/evidence/:id/verify", validEvidenceId, (req, res) => {
   try {
     const { id } = req.params;
     const db = readLocalDb();
@@ -206,7 +274,7 @@ app.get("/evidence/:id/verify", (req, res) => {
   }
 });
 
-app.get("/evidence/:id/chain-check", (req, res) => {
+app.get("/evidence/:id/chain-check", validEvidenceId, (req, res) => {
   const { id } = req.params;
   const db = readLocalDb();
   if (!db.evidence[id]) return res.status(404).json({ message: "Evidence not found." });
@@ -214,6 +282,8 @@ app.get("/evidence/:id/chain-check", (req, res) => {
   const result = checkCustodyChain(id, events);
   res.json({ evidenceId: id, ...result });
 });
+
+let lastSync = { online: false, pushed: 0, pulled: 0, at: null };
 
 async function runSyncLoop() {
   const result = await syncNow();
@@ -225,8 +295,16 @@ async function runSyncLoop() {
   }
 }
 
+// Multer file-size/type rejections land here as errors, not thrown exceptions
+app.use((err, req, res, next) => {
+  if (err) {
+    return res.status(400).json({ message: err.message || "Request failed." });
+  }
+  next();
+});
+
 app.listen(PORT, () => {
   console.log(`ChainTrace backend running at http://localhost:${PORT}`);
   runSyncLoop();
-  setInterval(runSyncLoop, 20000); // try syncing every 20 seconds
+  setInterval(runSyncLoop, 20000);
 });
