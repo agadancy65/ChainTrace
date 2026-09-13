@@ -1,0 +1,7 @@
+{
+  "env": { "node": true, "es2021": true },
+  "parserOptions": { "ecmaVersion": 2021 },
+  "plugins": ["security"],
+  "extends": ["plugin:security/recommended-legacy"],
+  "ignorePatterns": ["node_modules/", "data/", "uploads/"]
+}
