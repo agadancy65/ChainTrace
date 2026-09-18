@@ -58,7 +58,7 @@ async function loadTimeline() {
   timelineEmpty.style.display = "none";
 
   try {
-    const response = await fetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/custody`);
+    const response = await authFetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/custody`);
     if (!response.ok) throw new Error(`Server returned status ${response.status}.`);
     const events = await response.json();
     renderTimeline(Array.isArray(events) ? events : []);
@@ -112,7 +112,7 @@ async function submitCustodyEvent() {
   addEventStatus.innerHTML = "";
 
   try {
-    const response = await fetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/custody`, {
+    const response = await authFetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/custody`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action, actor }),
@@ -141,7 +141,7 @@ async function runChainCheck() {
   chainCheckResult.innerHTML = `<div class="loading">Checking chain integrity...</div>`;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/chain-check`);
+    const response = await authFetch(`${API_BASE_URL}/evidence/${encodeURIComponent(evidenceId)}/chain-check`);
     if (!response.ok) throw new Error(`Server returned status ${response.status}.`);
     const data = await response.json();
 
