@@ -37,12 +37,11 @@ Do not commit your `.env` file or your Atlas connection string to GitHub. If you
 - Go to the Evidence List to see it appear in the dashboard.
 - Click into an evidence item to open its Custody Trail. From there you can add a custody event (Transferred, Viewed, Exported, Other) and run Verify Integrity or Check Chain Integrity.
 
-## The demo tools
+## The demo tool
 
-Two scripts exist outside the running app, meant only for recording the demo video, not for production use:
+A script exist outside the running app, meant only for recording the demo video, not for production use:
 
 - **`demo-tamper.js`** deliberately flips one bit in a stored evidence file so you can show Verify Integrity catching it. Run it from the project root with `node demo-tamper.js <evidenceId>`. It is terminal only and cannot be triggered from the web app, which is intentional. An app that shipped a tamper button reachable from the browser would be a real security flaw.
-- **`demo-reset.js`** clears the local `data/db.json` file and the `uploads/` folder. It does not touch MongoDB Atlas, so anything already synced will reappear within about twenty seconds. Because of that, it is not very useful as a full reset. For rehearsal, it is simpler to just upload a fresh, distinctly named test file each time rather than trying to wipe everything.
 
 ## What not to do
 
